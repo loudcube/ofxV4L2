@@ -152,7 +152,7 @@ class ofxV4L2
 
         unsigned char * image;		// used to store captured frame for use in an app
         int camWidth, camHeight;	// must be set before calling init_device()
-        char * dev_name;			// device name
+        char dev_name[100];			// device name
         int io;						// input method
         int fd;						// file descriptor (used to address the device)
         struct buffer * buffers;	// pointer to buffers (no idea what this exactly means, neither how it is used)

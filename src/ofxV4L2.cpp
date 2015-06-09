@@ -88,7 +88,8 @@ void ofxV4L2::initGrabber(const char * devname, int iomethod, int cw, int ch)
 	camWidth = cw;
 	camHeight = ch;
 	image = new unsigned char[camWidth * camHeight];
-	dev_name = devname;
+	//dev_name = devname;
+	strcpy(dev_name,devname);
 
 	// check if framerate was set externally
 	if(v4l2framerate == 0)
@@ -122,7 +123,7 @@ int ofxV4L2::xioctl (int fd, int request, void * arg)
 void ofxV4L2::process_image(const void * p, int length)
 {
 	int row, col;
-	unsigned char * y = p;
+	unsigned char * y = (unsigned char*)p;
 	for (row=0; row<camHeight; row++)
 	{
 		for (col=0; col<camWidth; col++)
@@ -158,7 +159,7 @@ void ofxV4L2::grabFrame(void)
 	if (-1 == r)
 	{
 		if (EINTR == errno)
-			return 0;
+			return;
 		errno_exit ("select");
 	}
 
@@ -176,7 +177,7 @@ void ofxV4L2::grabFrame(void)
                 switch (errno)
                 {
                     case EAGAIN:
-                        return 0;
+                        return;
                     case EIO:
                         /* Could ignore EIO, see spec. */
                         /* fall through */
@@ -200,7 +201,7 @@ void ofxV4L2::grabFrame(void)
                 {
                     case EAGAIN:
 						newframe = false;
-                        return 0;
+                        return;
                     case EIO:
                         /* Could ignore EIO, see spec. */
                         /* fall through */
@@ -229,7 +230,7 @@ void ofxV4L2::grabFrame(void)
                 switch (errno)
                 {
                     case EAGAIN:
-                        return 0;
+                        return;
 
                     case EIO:
                         /* Could ignore EIO, see spec. */
@@ -361,7 +362,7 @@ void ofxV4L2::uninit_device(void)
 
 void ofxV4L2::init_read(unsigned int buffer_size)
 {
-    buffers = calloc (1, sizeof (*buffers));
+    buffers = (buffer*) calloc (1, sizeof (*buffers));
 
     if (!buffers) {
         fprintf (stderr, "Out of memory\n");
@@ -407,7 +408,7 @@ void ofxV4L2::init_mmap(void)
         exit (EXIT_FAILURE);
     }
 
-    buffers = calloc (req.count, sizeof (*buffers));
+    buffers = (buffer*) calloc (req.count, sizeof (*buffers));
 
     if (!buffers)
     {
@@ -468,7 +469,7 @@ void ofxV4L2::init_userp(unsigned int buffer_size)
         }
     }
 
-    buffers = calloc (4, sizeof (*buffers));
+    buffers = (buffer*)calloc (4, sizeof (*buffers));
 
     if (!buffers) {
             fprintf (stderr, "Out of memory\n");
@@ -643,7 +644,10 @@ void ofxV4L2::close_device(void)
 
 void ofxV4L2::open_device(const char * devname)
 {
-	dev_name = devname;
+	//dev_name = devname;
+	strcpy(dev_name,devname);
+
+
     struct stat st;
     // check if the device exists
     if (-1 == stat (dev_name, &st))
